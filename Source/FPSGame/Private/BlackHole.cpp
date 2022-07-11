@@ -12,6 +12,8 @@ ABlackHole::ABlackHole()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	// 禁用碰撞
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RootComponent = MeshComp;
 	
 	// SphereComp_1 为黑洞外层
@@ -22,6 +24,7 @@ ABlackHole::ABlackHole()
 	// SphereComp_2 为黑洞内层
 	SphereComp_2 = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp_2"));
 	SphereComp_2->SetSphereRadius(100);
+	// 绑定重叠事件函数：在重叠发生开始时添加动态事件
 	SphereComp_2->OnComponentBeginOverlap.AddDynamic(this, &ABlackHole::OverLapSphere);
 	SphereComp_2->SetupAttachment(MeshComp);
 }
@@ -34,7 +37,8 @@ void ABlackHole::BeginPlay()
 }
 
 // 销毁球体函数
-void ABlackHole::OverLapSphere(UPrimitiveComponent* OverLappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBoxIndex, bool bFromSweep, const FHitResult& SweepRsult)
+void ABlackHole::OverLapSphere(UPrimitiveComponent* OverLappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+	int32 OtherBoxIndex, bool bFromSweep, const FHitResult& SweepRsult)
 {
 	if (OtherActor)
 	{
@@ -55,8 +59,8 @@ void ABlackHole::Tick(float DeltaTime)
 	SphereComp_1->GetOverlappingComponents(OverLappingComps);
 
 	// OverLappingComps.Num() 数组长度
-	//int32 OLC_Length = OverLappingComps.Num();
-	for (int32 i = 0; i < OverLappingComps.Num(); i++)
+	int32 OLC_Length = OverLappingComps.Num();
+	for (int32 i = 0; i < OLC_Length; i++)
 	{
 		UPrimitiveComponent* PrimComp = OverLappingComps[i];
 
@@ -64,7 +68,7 @@ void ABlackHole::Tick(float DeltaTime)
 		if (PrimComp && PrimComp->IsSimulatingPhysics())
 		{
 			const float SphereRadius = SphereComp_1->GetScaledSphereRadius(); // 获取球体范围
-			const float ForceStrength = -5000;  // 径向力强度
+			const float ForceStrength = -3500;  // 径向力强度
 
 			// 对其他物体添加一个径向力
 			PrimComp->AddRadialForce(GetActorLocation(), SphereRadius, ForceStrength, ERadialImpulseFalloff::RIF_Constant, true);

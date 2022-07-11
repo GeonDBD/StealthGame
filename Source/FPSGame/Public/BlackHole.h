@@ -23,7 +23,9 @@ protected:
 
 	// Ïú»ÙÇòÌåº¯Êý
 	UFUNCTION()
-	virtual void OverLapSphere(UPrimitiveComponent* OverLappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBoxIndex, bool bFromSweep, const FHitResult& SweepRsult);
+	virtual void OverLapSphere(UPrimitiveComponent* OverLappedComp, 
+		AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+		int32 OtherBoxIndex, bool bFromSweep, const FHitResult& SweepRsult);
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
