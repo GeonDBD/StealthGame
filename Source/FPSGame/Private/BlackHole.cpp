@@ -13,8 +13,17 @@ ABlackHole::ABlackHole()
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
-	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	SphereComp->SetupAttachment(MeshComp);
+	
+	// SphereComp_1 为黑洞外层
+	SphereComp_1 = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp_1"));
+	SphereComp_1->SetSphereRadius(3000);
+	SphereComp_1->SetupAttachment(MeshComp);
+	
+	// SphereComp_2 为黑洞内层
+	SphereComp_2 = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp_2"));
+	SphereComp_2->SetSphereRadius(100);
+	SphereComp_2->OnComponentBeginOverlap.AddDynamic(this, &ABlackHole::OverLapSphere);
+	SphereComp_2->SetupAttachment(MeshComp);
 }
 
 // Called when the game starts or when spawned
@@ -24,10 +33,42 @@ void ABlackHole::BeginPlay()
 	
 }
 
+// 销毁球体函数
+void ABlackHole::OverLapSphere(UPrimitiveComponent* OverLappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBoxIndex, bool bFromSweep, const FHitResult& SweepRsult)
+{
+	if (OtherActor)
+	{
+		OtherActor->Destroy();
+	}
+}
+
 // Called every frame
 void ABlackHole::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// UPrimitiveComponent 指的是一类组件，能拥有变换
+	// 设置了一种类型的数组
+	TArray<UPrimitiveComponent*> OverLappingComps;
+
+	// 为外层球组件获取与之重叠的组件，存为数组
+	SphereComp_1->GetOverlappingComponents(OverLappingComps);
+
+	// OverLappingComps.Num() 数组长度
+	//int32 OLC_Length = OverLappingComps.Num();
+	for (int32 i = 0; i < OverLappingComps.Num(); i++)
+	{
+		UPrimitiveComponent* PrimComp = OverLappingComps[i];
+
+		// 判断是否为空组件和是否开启了模拟物理
+		if (PrimComp && PrimComp->IsSimulatingPhysics())
+		{
+			const float SphereRadius = SphereComp_1->GetScaledSphereRadius(); // 获取球体范围
+			const float ForceStrength = -5000;  // 径向力强度
+
+			// 对其他物体添加一个径向力
+			PrimComp->AddRadialForce(GetActorLocation(), SphereRadius, ForceStrength, ERadialImpulseFalloff::RIF_Constant, true);
+		}
+	}
 }
 

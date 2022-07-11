@@ -21,11 +21,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Ïú»ÙÇòÌåº¯Êý
+	UFUNCTION()
+	virtual void OverLapSphere(UPrimitiveComponent* OverLappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBoxIndex, bool bFromSweep, const FHitResult& SweepRsult);
+
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	USphereComponent* SphereComp;
+	USphereComponent* SphereComp_1;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USphereComponent* SphereComp_2;
 
 public:	
 	// Called every frame
