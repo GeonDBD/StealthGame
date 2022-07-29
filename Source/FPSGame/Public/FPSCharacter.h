@@ -12,7 +12,7 @@ class UCameraComponent;
 class AFPSProjectile;
 class USoundBase;
 class UAnimSequence;
-
+class UPawnNoiseEmitterComponent;
 
 UCLASS()
 class AFPSCharacter : public ACharacter
@@ -33,6 +33,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComponent;
 
+	// 声音发射器组件
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	UPawnNoiseEmitterComponent* NoiseEmitterCompment;
+
 public:
 	AFPSCharacter();
 
@@ -48,7 +52,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
 	UAnimSequence* FireAnimation;
 
-	// 
+	// 获取目标物品判断
 	UPROPERTY(BlueprintReadOnly, Category = "Gameplay")
 	bool bIsCarryingObjective;
 

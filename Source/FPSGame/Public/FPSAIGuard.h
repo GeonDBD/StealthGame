@@ -25,6 +25,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
 
+	// 人形体被看见时触发函数
+	UFUNCTION()
+	void OnPawnSeen(APawn* SeenPawn);
+
+	// 听到声音时触发函数
+	UFUNCTION()
+	void OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
