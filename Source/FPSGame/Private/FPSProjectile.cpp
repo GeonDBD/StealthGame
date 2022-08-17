@@ -29,6 +29,11 @@ AFPSProjectile::AFPSProjectile()
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
+
+	// 设置复制
+	SetReplicates(true);
+	// 设置复制移动
+	SetReplicateMovement(true);
 }
 
 
@@ -38,7 +43,15 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+	}
+
+	// 检查是否调用了服务器，是否客户端玩家正在操作
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		// 制造声音
+		MakeNoise(1.0f, GetInstigator());
 
 		Destroy();
 	}
+
 }

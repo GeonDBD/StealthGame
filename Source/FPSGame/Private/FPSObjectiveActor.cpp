@@ -23,6 +23,9 @@ AFPSObjectiveActor::AFPSObjectiveActor()
 	// 为一个通道设置碰撞响应设置为：给pawn，重叠
 	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	SphereComp->SetupAttachment(MeshComp);
+
+	// 
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -48,12 +51,16 @@ void AFPSObjectiveActor::NotifyActorBeginOverlap(AActor* OtherActor)
 	// 调用效果函数
 	PlayEffects();
 
-	// 定义我的角色，并强制装换
-	AFPSCharacter* MyCharacter = Cast<AFPSCharacter>(OtherActor);
-	if (MyCharacter)
+	// 
+	if (GetLocalRole() == ROLE_Authority)
 	{
-		MyCharacter->bIsCarryingObjective = true;
+		// 定义我的角色，并强制装换
+		AFPSCharacter* MyCharacter = Cast<AFPSCharacter>(OtherActor);
+		if (MyCharacter)
+		{
+			MyCharacter->bIsCarryingObjective = true;
 
-		Destroy();
+			Destroy();
+		}
 	}
 }
