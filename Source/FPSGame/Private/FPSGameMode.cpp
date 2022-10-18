@@ -5,6 +5,7 @@
 #include "FPSCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "FPSGameState.h"
 
 AFPSGameMode::AFPSGameMode()
 {
@@ -14,16 +15,16 @@ AFPSGameMode::AFPSGameMode()
 
 	// use our custom HUD class
 	HUDClass = AFPSHUD::StaticClass();
+
+	// 使用游戏状态类
+	GameStateClass = AFPSGameState::StaticClass();
 }
 
 void AFPSGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess)
 {
 	if (InstigatorPawn)
 	{
-		// 禁用pawn输入
-		// 专门用来禁用玩家控制器控制Pawn
-		InstigatorPawn->DisableInput(nullptr);
-
+		// 调整相机
 		// 要求观察视口类不为空
 		if (SpectatingViewpointClass)
 		{
@@ -36,12 +37,15 @@ void AFPSGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess)
 			{
 				AActor* NewViewTarget = ReturnedActors[0];
 
-				// 获取Pawn的控制器并转换为玩家控制器
-				APlayerController* PC = Cast<APlayerController>(InstigatorPawn->GetController());
-				if (PC)
+				// 
+				for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; It++)
 				{
-					// 使用Blend设置视图目标
-					PC->SetViewTargetWithBlend(NewViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
+					APlayerController* PC = Cast<APlayerController>(It->Get());
+					if (PC)
+					{
+						// 使用Blend设置视图目标
+						PC->SetViewTargetWithBlend(NewViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
+					}
 				}
 			}
 		}
@@ -51,5 +55,13 @@ void AFPSGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess)
 		}
 	}
 
+	// 获取游戏状态
+	AFPSGameState* GS = GetGameState<AFPSGameState>();
+	if (GS)
+	{
+		GS->MulticastOnMissionComplete(InstigatorPawn, bMissionSuccess);
+	}
+
+	// 调用umg
 	OnMissionCompleted(InstigatorPawn, bMissionSuccess);
 }

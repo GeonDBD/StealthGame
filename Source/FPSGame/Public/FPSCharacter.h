@@ -53,7 +53,7 @@ public:
 	UAnimSequence* FireAnimation;
 
 	// 获取目标物品判断
-	UPROPERTY(BlueprintReadOnly, Category = "Gameplay")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Gameplay")
 	bool bIsCarryingObjective;
 
 protected:
